@@ -18,7 +18,7 @@
 
 ## 贡献
 
-欢迎提交 Issues 或 Pull Requests 来帮助改进这个项目。
+欢迎提交 Issues 或 PRs 来帮助改进这个项目。
 
 ## 许可证
 
