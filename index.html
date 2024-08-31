@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YKload - Nav</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.font.im/css2?family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="background"></div>
+    <div id="wordCloud" class="word-cloud"></div>
+    <div class="container">
+
+        <div class="setting">
+            <div class="setting-item">
+                <h1>搜索引擎</h1>
+                                
+                <input type="radio" id="baidu" name="searchEngine" value="baidu" checked>
+                <label for="baidu">百度</label>
+                
+                <input type="radio" id="bing" name="searchEngine" value="bing">
+                <label for="bing">必应</label>
+                
+                <input type="radio" id="google" name="searchEngine" value="google">
+                <label for="google">Google</label>
+
+                <input type="radio" id="duckduckgo" name="searchEngine" value="duckduckgo">
+                <label for="duckduckgo">DuckDuckGo</label>
+            </div>
+
+            <div class="setting-item">
+                <h1>背景壁纸</h1>
+
+                <input type="radio" id="landscape" name="bg" value="landscape" checked>
+                <label for="landscape">风景 - Bing 日图</label>
+                
+                <input type="radio" id="moe" name="bg" value="moe">
+                <label for="moe">萌图 - 次元API</label>
+            </div>
+            
+            <div class="setting-item">
+                <h1>联想弹幕</h1>
+
+                <input type="radio" id="off" name="danmaku" value="off">
+                <label for="off">关闭</label>
+                
+                <input type="radio" id="on" name="danmaku" value="on" checked>
+                <label for="on">开启</label>
+            </div>
+
+        </div>
+        
+        
+        
+        <div class="time-date">
+            <div id="time"><span id="hours"></span><span id="colon">:</span><span id="minutes"></span></div>
+            <div id="date"></div>
+        </div>
+        <div class="search-container">
+            <div id="focus-hint" class="focus-hint">按 Space 键   |   点此处搜索</div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="要搜什么呢...">
+                <button id="normalSearchBtn" class="search-btn" style="display: flex; justify-content: center; align-items: center;">
+                    <img src="images/Nav-SearchBar.svg" alt="QiuSeek" class="qiuseek-bar" style="width: 100%; height: auto; max-width: 100px; max-height: 100%;">
+                </button>
+                <button id="navBtn" class="search-btn" style="display: flex; justify-content: center; align-items: center;">
+                    <img src="images/YKload-Nav.svg" alt="QiuSeek" class="qiuseek-bar" style="width: 100%; height: auto; max-width: 100px; max-height: 100%;">
+                </button>
+                <button id="qiuseekBtn" class="search-btn" style="display: flex; justify-content: center; align-items: center;">
+                    <img src="images/Nav-QiuSeekBar.svg" alt="QiuSeek" class="qiuseek-bar" style="width: 100%; height: auto; max-width: 100px; max-height: 100%;">
+                </button>
+            </div>
+            <ul id="suggestions" class="suggestions"></ul>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2024 YKload - Nav. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

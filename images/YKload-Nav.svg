@@ -1,0 +1,27 @@
+<svg width="500.000000" height="500.000000" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<filter id="filter_2_5_dd" x="29.633514" y="15.969635" width="441.396851" height="504.006012" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+			<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+			<feOffset dx="0" dy="0"/>
+			<feGaussianBlur stdDeviation="8.33333"/>
+			<feComposite in2="hardAlpha" operator="out" k2="-1" k3="1"/>
+			<feColorMatrix type="matrix" values="0 0 0 0 0.66275 0 0 0 0 0.71765 0 0 0 0 0.77647 0 0 0 1 0"/>
+			<feBlend mode="normal" in2="BackgroundImageFix" result="effect_dropShadow_1"/>
+			<feBlend mode="normal" in="SourceGraphic" in2="effect_dropShadow_1" result="shape"/>
+		</filter>
+		<clipPath id="clip2_1">
+			<rect id="YKload-Nav" width="500.000000" height="500.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<rect id="YKload-Nav" width="500.000000" height="500.000000" fill="#FFFFFF" fill-opacity="0"/>
+	<g clip-path="url(#clip2_1)">
+		<circle id="椭圆 1" cx="250.000000" cy="250.000000" r="225.000000" fill="#7F95AF" fill-opacity="1.000000"/>
+		<g filter="url(#filter_2_5_dd)">
+			<path id="矢量 1" d="M65 403.63L176.82 118.1L176.82 451L222.87 328.63L268.91 206.26L320.22 419.42L436 51M222.87 328.63L268.91 328.63" stroke="#FFFFFF" stroke-opacity="1.000000" stroke-width="16.000000" stroke-linecap="square"/>
+		</g>
+	</g>
+</svg>
