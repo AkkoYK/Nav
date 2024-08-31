@@ -1,3 +1,5 @@
+![YKload_OST](YKload_OST.png)
+
 # Nav
  一个出自 [YKload](https://ykload.com) 的 Shell 风格的浏览器起始页。
 
