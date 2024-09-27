@@ -20,6 +20,11 @@ body, html {
     user-select: none; 
 }
 
+body.light-mode, html.light-mode {
+    color: #333;
+    background-color: #f0f0f0;
+}
+
 .background {
     position: fixed;
     top: 0;
@@ -49,7 +54,10 @@ body, html {
     z-index: 1;
 }
 
-
+body.light-mode .background::after {
+    background-color: rgba(255, 255, 255, 0.1);
+    background-image: radial-gradient(rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, .5) 100%), radial-gradient(rgba(255, 255, 255, 0) 33%, rgba(255, 255, 255, .3) 166%);
+}
 
 .container {
     position: relative;
@@ -67,6 +75,10 @@ body, html {
     background-color: rgba(43, 43, 43, 0.7);
 }
 
+body.light-mode .container.focus-mode {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
 .time-date {
     color: #ffffff;
     font-family: 'Fira Code';
@@ -82,6 +94,10 @@ body, html {
     color: #A9B7C6;
 }
 
+body.light-mode .time-date.focus-mode {
+    color: #333;
+}
+
 #time {
     display: flex;
     font-size: 3.5rem;
@@ -89,14 +105,26 @@ body, html {
     transition: all 0.15s ease-out;
 }
 
+body.light-mode #time {
+    text-shadow: 0px 0px 10px #333;
+}
+
 #time:hover {
     text-shadow: 0px 0px 20px #A9B7C6; 
     filter: brightness(1.5);
 }
 
+body.light-mode #time:hover {
+    text-shadow: 0px 0px 20px #333; 
+}
+
 #time:active {
     text-shadow: 0px 0px 5px #A9B7C6; 
     transform: scale(0.9); 
+}
+
+body.light-mode #time:active {
+    text-shadow: 0px 0px 5px #333; 
 }
 
 #date {
@@ -105,6 +133,9 @@ body, html {
     text-shadow: 0px 0px 5px #A9B7C6;
 }
 
+body.light-mode #date {
+    text-shadow: 0px 0px 5px #333;
+}
 
 #colon {
     font-family: math;
@@ -137,6 +168,10 @@ body, html {
     box-shadow: 0px 25px 25px #a9b7c670;
 }
 
+body.light-mode .search-bar {
+    box-shadow: 0px 25px 25px #33333370;
+}
+
 .search-bar:hover {
     opacity: 1;
 }
@@ -146,7 +181,9 @@ body, html {
     color: #A9B7C6;
 }
 
-  
+body.light-mode .search-bar.focus-mode {
+    color: #333;
+}
 
 #searchInput {
     font-family: 'MiSans','Fira Code', monospace;
@@ -160,9 +197,17 @@ body, html {
     z-index: 1;
 }
 
+body.light-mode #searchInput {
+    background-color: #ffffff00;
+}
+
 #searchInput:hover {
     box-shadow: 0px 0px 25px #a9b7c670;
     filter: brightness(1.5);
+}
+
+body.light-mode #searchInput:hover {
+    box-shadow: 0px 0px 25px #33333370;
 }
 
 #searchInput::placeholder {
@@ -176,12 +221,20 @@ body, html {
 #searchInput:focus, #searchEngine:focus {
     outline: none;
     color: #A9B7C6;
+}
 
+body.light-mode #searchInput:focus, body.light-mode #searchEngine:focus {
+    color: #333;
 }
 
 #searchInput::selection {
     background-color: #a9b7c698;
     color: #000;
+}
+
+body.light-mode #searchInput::selection {
+    background-color: #33333398;
+    color: #fff;
 }
 
 .search-btn {
@@ -197,6 +250,11 @@ body, html {
     pointer-events: none;
     opacity: 0;
     transition: all 0.3s ease-out;
+}
+
+body.light-mode .search-btn {
+    background-color: #ffffff00;
+    color: #333;
 }
 
 .search-btn i {
@@ -227,6 +285,9 @@ body, html {
     /* box-shadow: 0px 0px 25px #a9b7c670; */
 }
 
+body.light-mode .suggestions {
+    background-color: #ffffff8c;
+}
 
 .suggestion-item {
     display: flex;
@@ -253,6 +314,11 @@ body, html {
     opacity: 0.35;
 }
 
+body.light-mode .suggestion-item::before {
+    background-color: #3333339d;
+    box-shadow: 0px 0px 25px #3333339d;
+}
+
 .suggestion-item.selected::before,
 .suggestion-item:hover::before {
     width: 100%; 
@@ -264,6 +330,12 @@ body, html {
     color: #d7eaff;
     text-shadow: 0px 0px 2px #A9B7C6;
     letter-spacing: 3px;
+}
+
+body.light-mode .suggestion-item.selected,
+body.light-mode .suggestion-item:hover {
+    color: #333;
+    text-shadow: 0px 0px 2px #333;
 }
 
 footer {
@@ -284,6 +356,10 @@ footer {
 
 footer.focus-mode {
     color: #a9b7c6b5;
+}
+
+body.light-mode footer.focus-mode {
+    color: #333;
 }
 
 @keyframes fadeInDown {
@@ -353,10 +429,14 @@ footer.focus-mode {
     animation-iteration-count: infinite;
 }
 
+body.light-mode .word-cloud-row {
+    color: #333;
+    text-shadow: 0px 0px 3px rgb(51 51 51);
+}
+
 .word-cloud-row:nth-child(even) {
     animation-name: slideRight;
 }
-
 
 @keyframes slideLeft {
     from { transform: translateX(0); }
@@ -367,9 +447,6 @@ footer.focus-mode {
     from { transform: translateX(-100%); }
     to { transform: translateX(0); }
 }
-
-
-
 
 .focus-hint {
     height: 31px;
@@ -395,9 +472,18 @@ footer.focus-mode {
     box-shadow: 0px 0px 25px #A9B7C6;
 }
 
+body.light-mode .focus-hint {
+    background-color: #333333d1;
+    box-shadow: 0px 0px 25px #333;
+}
+
 .focus-hint:hover {
     background-color: #91a2b3;
     filter: brightness(1.5);
+}
+
+body.light-mode .focus-hint:hover {
+    background-color: #333;
 }
 
 .focus-hint.focus-mode {
@@ -407,6 +493,11 @@ footer.focus-mode {
     width: 600px;
     opacity: 0;
     filter: blur(25px);
+}
+
+body.light-mode .focus-hint.focus-mode {
+    background-color: #3333332d;
+    color: #333;
 }
 
 .search-overlay {
@@ -427,10 +518,14 @@ footer.focus-mode {
     transform-origin: center center;
 }
 
+body.light-mode .search-overlay {
+    background-color: rgb(240, 240, 240);
+    color: #333;
+}
+
 .search-overlay.visible {
     opacity: 1;
 }
-
 
 .setting {
     display: flex;
@@ -455,7 +550,9 @@ footer.focus-mode {
     background-color: #2b2b2b8c;
 }
 
-
+body.light-mode .setting.open {
+    background-color: #ffffff8c;
+}
 
 .setting-item {
     position: relative;
@@ -472,6 +569,11 @@ footer.focus-mode {
     font-weight: normal;
     color: #d7eaff;
     text-shadow: 0px 0px 5px #A9B7C6;
+}
+
+body.light-mode .setting-item h1 {
+    color: #333;
+    text-shadow: 0px 0px 5px #333;
 }
 
 .setting input[type="radio"] {
@@ -507,19 +609,28 @@ footer.focus-mode {
     opacity: 0.35;
 }
 
+body.light-mode .setting label::before {
+    background-color: #3333339d;
+    box-shadow: 0px 0px 10px #3333339d;
+}
+
 .setting label.selected::before,
 .setting label:hover::before {
     width: 100%; 
-
 }
 
 .setting label.selected,
 .setting label:hover {
-
     color: #d7eaff;
     text-shadow: 0px 0px 5px #A9B7C6;
     filter: brightness(1.2);
     letter-spacing: 3px;
+}
+
+body.light-mode .setting label.selected,
+body.light-mode .setting label:hover {
+    color: #333;
+    text-shadow: 0px 0px 5px #333;
 }
 
 /* 选中标签的颜色 */
@@ -530,7 +641,12 @@ footer.focus-mode {
     box-shadow: 0px 0px 10px #7f95afd4;
 }
 
-
+body.light-mode .setting-item input:checked + label {
+    color: #333;
+    text-shadow: 0px 0px 5px #333;
+    background-color: #ccccccd4;
+    box-shadow: 0px 0px 10px #ccccccd4;
+}
 
 /* 动画效果 */
 @keyframes fadeIn {
@@ -563,7 +679,6 @@ footer.focus-mode {
     filter: brightness(1.5);
 }
 
-
 .search-btn:hover .qiuseek-icon .qiuseek-bar,
 .suggestion-btn:hover .qiuseek-icon .qiuseek-bar {
     filter: brightness(1.5);
@@ -587,5 +702,3 @@ footer.focus-mode {
     z-index: 1;
     margin-right: 10px;
 }
-
-

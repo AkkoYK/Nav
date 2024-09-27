@@ -1,4 +1,3 @@
-// 更新时间和日期
 function updateTimeDate() {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
@@ -11,18 +10,14 @@ function updateTimeDate() {
 setInterval(updateTimeDate, 1000);
 updateTimeDate();
 
-// 搜索功能
 const focusHint = document.getElementById('focus-hint');
 const searchInput = document.getElementById('searchInput');
 const normalSearchBtn = document.getElementById('normalSearchBtn');
 const qiuseekBtn = document.getElementById('qiuseekBtn');
 const suggestions = document.getElementById('suggestions');
 
-// 获取所有类名为.setting的设置块
 document.querySelectorAll('.setting').forEach(setting => {
-    // 在每个.setting中找到所有类名为.setting-item的设置项
     setting.querySelectorAll('.setting-item').forEach(item => {
-        // 找到当前设置项中的所有input[type="radio"]元素
         item.querySelectorAll('input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', function() {
                 const value = this.value;
@@ -30,42 +25,37 @@ document.querySelectorAll('.setting').forEach(setting => {
                 console.log(`Setting ${name} changed to ${value}`);
 
                 setBackgroundUrl();
-    
-                // 保存当前设置到localStorage
+                setThemeMode(); // Pfb2d
+
                 localStorage.setItem(name, value);
             });
         });
 
-        // 初始化设置项的值
         initializeSetting(item);
     });
 });
 
-// 初始化设置项的值函数
 function initializeSetting(item) {
-    // 找到当前设置项中的所有input[type="radio"]元素
     item.querySelectorAll('input[type="radio"]').forEach(radio => {
         const name = radio.name;
         const storedValue = localStorage.getItem(name);
 
-        // 如果localStorage中有保存的值，则设置为保存的值
         if (storedValue !== null && storedValue !== '') {
             radio.checked = (radio.value === storedValue);
         } else {
-            // 否则使用默认值（第一个选项）
             radio.checked = radio.defaultChecked;
         }
     });
 }
 
-// 页面加载时，初始化所有设置项的值
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.setting-item').forEach(item => {
         initializeSetting(item);
     });
+    setThemeMode(); // Pd365
 });
 
-let selectedSuggestionIndex = -1; // 选中的搜索建议索引
+let selectedSuggestionIndex = -1;
 let pressTimer;
 let isLongPress = false;
 
@@ -128,7 +118,6 @@ function performSearch() {
     const searchEngine = document.querySelector('input[name="searchEngine"]:checked').value;
     let searchUrl;
 
-    // 添加跳转动画效果
     const overlay = document.createElement('div');
     overlay.className = 'search-overlay';
     document.body.appendChild(overlay);
@@ -138,14 +127,12 @@ function performSearch() {
     suggestions.style.height = '0px';
     focusHint.style.transform = `translate(-50% , -50%)`;
     updateWordCloud([]);
-    selectedSuggestionIndex = -1; // 重置选中的搜索建议索引
+    selectedSuggestionIndex = -1;
 
-    // 淡入动画效果
     setTimeout(() => {
         overlay.classList.add('visible');
     }, 300);
 
-    // 淡出动画效果，然后执行搜索跳转
     setTimeout(() => {
         switch(searchEngine) {
             case 'baidu':
@@ -165,21 +152,19 @@ function performSearch() {
         window.open(searchUrl, '_blank');
         searchInput.value = '';
         
-        // 移除 overlay 元素
         setTimeout(() => {
             overlay.classList.remove('visible');
             setTimeout(() => {
                 overlay.remove();
-            }, 125); // 等待淡出动画完成后移除 overlay 元素
-        }, 250); // 等待搜索跳转完成后执行淡出动画
-    }, 500); // 500毫秒后执行搜索跳转，以便观察跳转动画
+            }, 125);
+        }, 250);
+    }, 500);
 }
 
 function performQiuSeek() {
     const query = searchInput.value;
     let searchUrl = `https://qs.ykload.com/?q=${encodeURIComponent(query)}`;
 
-    // 添加跳转动画效果
     const overlay = document.createElement('div');
     overlay.className = 'search-overlay';
     document.body.appendChild(overlay);
@@ -189,33 +174,28 @@ function performQiuSeek() {
     suggestions.style.height = '0px';
     focusHint.style.transform = `translate(-50% , -50%)`;
     updateWordCloud([]);
-    selectedSuggestionIndex = -1; // 重置选中的搜索建议索引
+    selectedSuggestionIndex = -1;
 
-    // 淡入动画效果
     setTimeout(() => {
         overlay.classList.add('visible');
     }, 300);
 
-    // 淡出动画效果，然后执行搜索跳转
     setTimeout(() => {
         window.open(searchUrl, '_blank');
         searchInput.value = '';
         
-        // 移除 overlay 元素
         setTimeout(() => {
             overlay.classList.remove('visible');
             setTimeout(() => {
                 overlay.remove();
-            }, 125); // 等待淡出动画完成后移除 overlay 元素
-        }, 250); // 等待搜索跳转完成后执行淡出动画
-    }, 500); // 500毫秒后执行搜索跳转，以便观察跳转动画
+            }, 125);
+        }, 250);
+    }, 500);
 }
 
-// 添加按钮点击事件监听器
 normalSearchBtn.addEventListener('click', performSearch);
 qiuseekBtn.addEventListener('click', performQiuSeek);
 
-// 搜索联想功能
 let debounceTimer;
 
 searchInput.addEventListener('input', function() {
@@ -232,7 +212,7 @@ searchInput.addEventListener('input', function() {
             updateWordCloud([]);
         }
         toggleSearchButtons();
-        selectedSuggestionIndex = -1; // 重置选中的搜索建议索引
+        selectedSuggestionIndex = -1;
     }, 300);
 });
 
@@ -243,7 +223,7 @@ searchInput.addEventListener('focus', function() {
 
 searchInput.addEventListener('blur', function() {
     toggleFocusMode(false);
-    setTimeout(toggleSearchButtons, 100); // 延迟执行，以便在点击搜索按钮时能正确触发搜索
+    setTimeout(toggleSearchButtons, 100);
 });
 
 function fetchSuggestions(query) {
@@ -253,18 +233,16 @@ function fetchSuggestions(query) {
     document.body.appendChild(script);
 }
 
-// 前端定义的回调函数，用于处理返回的数据
 function processSuggestions(data) {
     const danmaku = document.querySelector('input[name="danmaku"]:checked').value;
 
     if (!Array.isArray(data.s)) {
-        // console.error('Received unexpected data format:', data);
         return;
     }
 
-    showSuggestions(data.s); // 百度返回的是类似 Google 的 [搜索词, [相关搜索词]] 结构，可以使用 data.s 作为相关搜索词数组
+    showSuggestions(data.s);
     if (danmaku === 'on') {
-        updateWordCloud(data.s); // 也用 data.s 来更新词云
+        updateWordCloud(data.s);
     }
 }
 
@@ -325,10 +303,9 @@ function showSuggestions(items) {
     focusHintLength = suggestionLength / 2;
     focusHint.style.transform = `translate(-50% , -${focusHintLength}px)`;
     
-    selectedSuggestionIndex = -1; // 重置选中的搜索建议索引
+    selectedSuggestionIndex = -1;
 }
 
-// 点击页面其他地方时隐藏建议和词云
 document.addEventListener('click', function(e) {
     if (e.target !== searchInput && e.target !== suggestions) {
         suggestions.style.height = '0px';
@@ -337,7 +314,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// 添加焦点模式
 function toggleFocusMode(active) {
     document.querySelector('.background').classList.toggle('focus-mode', active);
     document.querySelector('.search-container').classList.toggle('focus-mode', active);
@@ -350,16 +326,14 @@ function toggleFocusMode(active) {
     document.querySelector('.setting').classList.remove('open', active);
     
 
-    // 延迟设置高度和透明度，确保平滑过渡
     setTimeout(() => {
         focusHint.style.transform = active ? `translate(-50% , -${focusHintLength}px)` : `translate(-50% , -50%)`;
         suggestions.style.height = active ? suggestionLength + 'px' : '0px';
         suggestions.style.opacity = active ? 1 : 0;
         wordCloud.style.opacity = active ? 1 : 0;
-    }, 100); // 可以根据实际情况调整延迟时间
+    }, 100);
 }
 
-// 使用空格键快速聚焦搜索栏
 document.addEventListener('keydown', function(e) {
     if (document.activeElement === searchInput || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
         return;
@@ -371,7 +345,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// 词云功能
 let wordCloudWords = [];
 const wordCloud = document.getElementById('wordCloud');
 const currentWordCloud = wordCloud.querySelectorAll('.word-cloud-row');
@@ -382,9 +355,8 @@ function updateWordCloud(words) {
 }
 
 function renderWordCloud() {
-    wordCloud.style.opacity = 0; // 将透明度设置为0，触发淡出动画
+    wordCloud.style.opacity = 0;
 
-    // 在淡出动画完成后，清空词云内容并开始新的渲染
     setTimeout(() => {
         wordCloud.innerHTML = '';
         const rowCount = Math.floor(window.innerHeight / 100);
@@ -404,23 +376,18 @@ function renderWordCloud() {
             wordCloud.appendChild(row);
         }
 
-        // 强制浏览器回流，触发新的渲染
         void wordCloud.offsetWidth;
 
-        // 淡入新的词云
         setTimeout(() => {
-            wordCloud.style.opacity = 1; // 淡入动画
-        }, 50); // 50毫秒后开始淡入动画
-    }, 300); // 等待0.3秒后开始清空词云内容和淡出动画，与CSS过渡的时长对应
+            wordCloud.style.opacity = 1;
+        }, 50);
+    }, 300);
 }
 
-// 在窗口大小改变时重新渲染词云
 window.addEventListener('resize', renderWordCloud);
 
-// 初始化
 renderWordCloud();
 
-// 设置背景URL的函数
 function setBackgroundUrl() {
     const bgType = document.querySelector('input[name="bg"]:checked').value;
     const backgroundElement = document.querySelector('.background');
@@ -431,40 +398,27 @@ function setBackgroundUrl() {
             imageUrl = 'https://api.dujin.org/bing/1920.php';
             break;
         case 'moe':
-            // 以下请求会在每次更改设置时被触发，固先停用
-            // 添加时间戳参数以确保每次请求唯一
-            // const timestamp = Date.now();
-            // imageUrl = `https://t.alcy.cc/moez?timestamp=${timestamp}`;
-
             imageUrl = `https://t.alcy.cc/moez`;
             break;
         default:
-            // Handle default case if needed
             break;
     }
 
     if (imageUrl) {
-        // 创建一个新的Image对象来加载背景图片
         const img = new Image();
         img.onload = function() {
-            // 图片加载完毕后设置背景，并添加淡入动画类
             backgroundElement.style.backgroundImage = `url('${imageUrl}')`;
             backgroundElement.classList.add('fade-in');
         };
-        img.src = imageUrl; // 开始加载图片
+        img.src = imageUrl;
     }
 }
 
-// 监测背景图片加载/切换的函数
 function monitorBackgroundChanges() {
     const backgroundElement = document.querySelector('.background');
-
-    // 在CSS中定义.fade-in类的淡入效果
-    // 可以根据需要调整动画效果
     backgroundElement.classList.add('fade-in');
 }
 
-// 页面加载完成时执行设置背景和添加动画效果
 document.addEventListener('DOMContentLoaded', function() {
     setBackgroundUrl();
     monitorBackgroundChanges();
@@ -472,7 +426,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function toggleSettingOpen() {
     var setting = document.querySelector('.setting');
-    // 切换是否具有 .open 类
     setting.classList.toggle('open');
 
     document.querySelector('.background').classList.toggle('focus-mode');
@@ -483,7 +436,6 @@ function toggleSettingOpen() {
     document.querySelector('footer').classList.toggle('focus-mode');
 }
 
-// 监听 #time 元素的点击事件
 document.getElementById('time').addEventListener('click', toggleSettingOpen);
 
 function toggleSearchButtons() {
@@ -499,5 +451,15 @@ function toggleSearchButtons() {
     navBtn.style.width = buttonsVisible ? '0px' : '45px';
 }
 
-// 初始化搜索按钮显示状态
 document.addEventListener('DOMContentLoaded', toggleSearchButtons);
+
+function setThemeMode() {
+    const theme = document.querySelector('input[name="theme"]:checked').value;
+    if (theme === 'light') {
+        document.body.classList.add('light-mode');
+        document.documentElement.classList.add('light-mode');
+    } else {
+        document.body.classList.remove('light-mode');
+        document.documentElement.classList.remove('light-mode');
+    }
+}
