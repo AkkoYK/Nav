@@ -3,82 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YKload - Nav</title>
+    <title>YKload — Nav</title>
+    <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.font.im/css2?family=Fira+Code&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-    <div class="background"></div>
-    <div id="wordCloud" class="word-cloud"></div>
-    <div class="container">
 
-        <div class="setting">
-            <div class="setting-item">
-                <h1>搜索引擎</h1>
-                                
-                <input type="radio" id="baidu" name="searchEngine" value="baidu" checked>
-                <label for="baidu">百度</label>
-                
-                <input type="radio" id="bing" name="searchEngine" value="bing">
-                <label for="bing">必应</label>
-                
-                <input type="radio" id="google" name="searchEngine" value="google">
-                <label for="google">Google</label>
-
-                <input type="radio" id="duckduckgo" name="searchEngine" value="duckduckgo">
-                <label for="duckduckgo">DuckDuckGo</label>
-            </div>
-
-            <div class="setting-item">
-                <h1>背景壁纸</h1>
-
-                <input type="radio" id="landscape" name="bg" value="landscape" checked>
-                <label for="landscape">风景 - Bing 日图</label>
-                
-                <input type="radio" id="moe" name="bg" value="moe">
-                <label for="moe">萌图 - 次元API</label>
-            </div>
-            
-            <div class="setting-item">
-                <h1>联想弹幕</h1>
-
-                <input type="radio" id="off" name="danmaku" value="off">
-                <label for="off">关闭</label>
-                
-                <input type="radio" id="on" name="danmaku" value="on" checked>
-                <label for="on">开启</label>
-            </div>
-
-        </div>
-        
-        
-        
-        <div class="time-date">
-            <div id="time"><span id="hours"></span><span id="colon">:</span><span id="minutes"></span></div>
-            <div id="date"></div>
-        </div>
-        <div class="search-container">
-            <div id="focus-hint" class="focus-hint">按 Space 键   |   点此处搜索</div>
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="要搜什么呢...">
-                <button id="normalSearchBtn" class="search-btn" style="display: flex; justify-content: center; align-items: center;">
-                    <img src="images/Nav-SearchBar.svg" alt="QiuSeek" class="qiuseek-bar" style="width: 100%; height: auto; max-width: 100px; max-height: 100%;">
-                </button>
-                <button id="navBtn" class="search-btn" style="display: flex; justify-content: center; align-items: center;">
-                    <img src="images/YKload-Nav.svg" alt="QiuSeek" class="qiuseek-bar" style="width: 100%; height: auto; max-width: 100px; max-height: 100%;">
-                </button>
-                <button id="qiuseekBtn" class="search-btn" style="display: flex; justify-content: center; align-items: center;">
-                    <img src="images/Nav-QiuSeekBar.svg" alt="QiuSeek" class="qiuseek-bar" style="width: 100%; height: auto; max-width: 100px; max-height: 100%;">
-                </button>
-            </div>
-            <ul id="suggestions" class="suggestions"></ul>
-        </div>
+    <div class="aurora">
+        <div class="aurora-blob aurora-blob--a"></div>
+        <div class="aurora-blob aurora-blob--b"></div>
+        <div class="aurora-blob aurora-blob--c"></div>
+        <div class="aurora-grain"></div>
     </div>
-    
+
+    <div class="background"></div>
+    <div class="background-veil"></div>
+
+    <div id="wordCloud" class="word-cloud"></div>
+
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <main class="container">
+
+        <section class="setting" aria-hidden="true">
+            <div class="setting-inner">
+                <div class="setting-item">
+                    <h1>搜索引擎</h1>
+                    <div class="setting-options">
+                        <input type="radio" id="baidu" name="searchEngine" value="baidu" checked>
+                        <label for="baidu">百度</label>
+
+                        <input type="radio" id="bing" name="searchEngine" value="bing">
+                        <label for="bing">必应</label>
+
+                        <input type="radio" id="google" name="searchEngine" value="google">
+                        <label for="google">Google</label>
+
+                        <input type="radio" id="duckduckgo" name="searchEngine" value="duckduckgo">
+                        <label for="duckduckgo">DuckDuckGo</label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <h1>背景壁纸</h1>
+                    <div class="setting-options">
+                        <input type="radio" id="landscape" name="bg" value="landscape" checked>
+                        <label for="landscape">风景 · Bing</label>
+
+                        <input type="radio" id="moe" name="bg" value="moe">
+                        <label for="moe">萌图 · 次元</label>
+
+                        <input type="radio" id="aurora" name="bg" value="aurora">
+                        <label for="aurora">极光 · Alive</label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <h1>联想弹幕</h1>
+                    <div class="setting-options">
+                        <input type="radio" id="off" name="danmaku" value="off">
+                        <label for="off">关闭</label>
+
+                        <input type="radio" id="on" name="danmaku" value="on" checked>
+                        <label for="on">开启</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="time-date">
+            <div id="time" role="button" aria-label="切换设置">
+                <span id="hours"></span><span id="colon">:</span><span id="minutes"></span>
+            </div>
+            <div id="date"></div>
+            <div class="time-pulse" aria-hidden="true"></div>
+        </section>
+
+        <section class="search-container">
+            <div id="focus-hint" class="focus-hint">
+                <span class="hint-key">Space</span>
+                <span class="hint-divider">·</span>
+                <span class="hint-text">点此处唤醒搜索</span>
+            </div>
+
+            <div class="search-bar">
+                <span class="search-bar-glow" aria-hidden="true"></span>
+                <input type="text" id="searchInput" placeholder="今天想探索什么..." autocomplete="off" spellcheck="false">
+                <button id="normalSearchBtn" class="search-btn" aria-label="普通搜索" type="button">
+                    <img src="images/Nav-SearchBar.svg" alt="搜索" class="qiuseek-bar">
+                </button>
+                <button id="navBtn" class="search-btn" aria-label="导航" type="button">
+                    <img src="images/YKload-Nav.svg" alt="导航" class="qiuseek-bar">
+                </button>
+                <button id="qiuseekBtn" class="search-btn" aria-label="求索 AI 搜索" type="button">
+                    <img src="images/Nav-QiuSeekBar.svg" alt="求索" class="qiuseek-bar">
+                </button>
+            </div>
+
+            <ul id="suggestions" class="suggestions" role="listbox"></ul>
+        </section>
+    </main>
+
     <footer>
-        <p>&copy; 2024 YKload - Nav. All rights reserved.</p>
+        <span class="brand-mark">YKload</span>
+        <span class="brand-divider">·</span>
+        <span>Nav</span>
+        <span class="brand-divider">·</span>
+        <span class="brand-tag">Alive Design</span>
     </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
