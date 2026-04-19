@@ -1,75 +1,63 @@
-// 更新时间和日期
-function updateTimeDate() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    document.getElementById('hours').textContent = hours;
-    document.getElementById('minutes').textContent = minutes;
-    document.getElementById('date').textContent = now.toLocaleDateString();
-}
+/* ==========================================================================
+   YKload — Nav · Alive Design
+   ========================================================================== */
 
-setInterval(updateTimeDate, 1000);
-updateTimeDate();
-
-// 搜索功能
+/* ---------- Element references ---------- */
 const focusHint = document.getElementById('focus-hint');
 const searchInput = document.getElementById('searchInput');
 const normalSearchBtn = document.getElementById('normalSearchBtn');
+const navBtn = document.getElementById('navBtn');
 const qiuseekBtn = document.getElementById('qiuseekBtn');
 const suggestions = document.getElementById('suggestions');
+const wordCloud = document.getElementById('wordCloud');
+const cursorGlow = document.getElementById('cursorGlow');
+const searchBar = document.querySelector('.search-bar');
+const aurora = document.querySelector('.aurora');
 
-// 获取所有类名为.setting的设置块
-document.querySelectorAll('.setting').forEach(setting => {
-    // 在每个.setting中找到所有类名为.setting-item的设置项
-    setting.querySelectorAll('.setting-item').forEach(item => {
-        // 找到当前设置项中的所有input[type="radio"]元素
-        item.querySelectorAll('input[type="radio"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                const value = this.value;
-                const name = this.name;
-                console.log(`Setting ${name} changed to ${value}`);
+/* ---------- Time & date ---------- */
+const dateFormatter = new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long',
+});
 
-                setBackgroundUrl();
-    
-                // 保存当前设置到localStorage
-                localStorage.setItem(name, value);
-            });
+function updateTimeDate() {
+    const now = new Date();
+    document.getElementById('hours').textContent = String(now.getHours()).padStart(2, '0');
+    document.getElementById('minutes').textContent = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('date').textContent = dateFormatter.format(now);
+}
+setInterval(updateTimeDate, 1000);
+updateTimeDate();
+
+/* ---------- Settings persistence ---------- */
+document.querySelectorAll('.setting-item').forEach(item => {
+    item.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            localStorage.setItem(this.name, this.value);
+            if (this.name === 'bg') setBackgroundUrl();
         });
-
-        // 初始化设置项的值
-        initializeSetting(item);
     });
 });
 
-// 初始化设置项的值函数
-function initializeSetting(item) {
-    // 找到当前设置项中的所有input[type="radio"]元素
-    item.querySelectorAll('input[type="radio"]').forEach(radio => {
-        const name = radio.name;
-        const storedValue = localStorage.getItem(name);
-
-        // 如果localStorage中有保存的值，则设置为保存的值
-        if (storedValue !== null && storedValue !== '') {
-            radio.checked = (radio.value === storedValue);
+function initializeSettings() {
+    document.querySelectorAll('.setting-item input[type="radio"]').forEach(radio => {
+        const stored = localStorage.getItem(radio.name);
+        if (stored !== null && stored !== '') {
+            radio.checked = (radio.value === stored);
         } else {
-            // 否则使用默认值（第一个选项）
             radio.checked = radio.defaultChecked;
         }
     });
 }
 
-// 页面加载时，初始化所有设置项的值
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.setting-item').forEach(item => {
-        initializeSetting(item);
-    });
-});
-
-let selectedSuggestionIndex = -1; // 选中的搜索建议索引
+/* ---------- Search interaction ---------- */
+let selectedSuggestionIndex = -1;
 let pressTimer;
 let isLongPress = false;
 
-searchInput.addEventListener('keydown', function(e) {
+searchInput.addEventListener('keydown', function (e) {
     if (this.value.trim() !== '') {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -82,11 +70,15 @@ searchInput.addEventListener('keydown', function(e) {
         } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
             e.preventDefault();
             navigateSuggestions(e.key === 'ArrowUp' ? -1 : 1);
+        } else if (e.key === 'Escape') {
+            this.blur();
         }
+    } else if (e.key === 'Escape') {
+        this.blur();
     }
 });
 
-searchInput.addEventListener('keyup', function(e) {
+searchInput.addEventListener('keyup', function (e) {
     if (e.key === 'Enter') {
         clearTimeout(pressTimer);
         if (!isLongPress) {
@@ -97,128 +89,81 @@ searchInput.addEventListener('keyup', function(e) {
 });
 
 function navigateSuggestions(direction) {
-    const suggestionItems = document.querySelectorAll('.suggestion-item');
-    if (suggestionItems.length === 0) return;
+    const items = document.querySelectorAll('.suggestion-item');
+    if (items.length === 0) return;
 
     selectedSuggestionIndex += direction;
-    if (selectedSuggestionIndex < 0) selectedSuggestionIndex = suggestionItems.length - 1;
-    if (selectedSuggestionIndex >= suggestionItems.length) selectedSuggestionIndex = 0;
+    if (selectedSuggestionIndex < 0) selectedSuggestionIndex = items.length - 1;
+    if (selectedSuggestionIndex >= items.length) selectedSuggestionIndex = 0;
 
-    updateSelectedSuggestion(suggestionItems);
-    searchInput.value = suggestionItems[selectedSuggestionIndex].querySelector('.suggestion-text').textContent;
+    items.forEach((item, i) => {
+        item.classList.toggle('selected', i === selectedSuggestionIndex);
+        item.setAttribute('aria-selected', i === selectedSuggestionIndex ? 'true' : 'false');
+    });
+
+    const selected = items[selectedSuggestionIndex];
+    selected.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    searchInput.value = selected.querySelector('.suggestion-text').textContent;
 }
 
-function updateSelectedSuggestion(suggestionsList) {
-    suggestionsList.forEach((item, index) => {
-        if (index === selectedSuggestionIndex) {
-            item.classList.add('selected');
-            item.setAttribute('aria-selected', 'true');
-        } else {
-            item.classList.remove('selected');
-            item.setAttribute('aria-selected', 'false');
-        }
+/* ---------- Search execution ---------- */
+function transitionAndOpen(url) {
+    const overlay = document.createElement('div');
+    overlay.className = 'search-overlay';
+    document.body.appendChild(overlay);
+
+    suggestionLength = 0;
+    focusHintLength = 0;
+    suggestions.style.height = '0px';
+    focusHint.style.transform = `translate(-50%, -50%)`;
+    updateWordCloud([]);
+    selectedSuggestionIndex = -1;
+
+    requestAnimationFrame(() => {
+        setTimeout(() => overlay.classList.add('visible'), 60);
     });
-    if (selectedSuggestionIndex !== -1) {
-        suggestionsList[selectedSuggestionIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+
+    setTimeout(() => {
+        window.open(url, '_blank');
+        searchInput.value = '';
+        toggleSearchButtons();
+
+        setTimeout(() => {
+            overlay.classList.remove('visible');
+            setTimeout(() => overlay.remove(), 350);
+        }, 220);
+    }, 460);
 }
 
 function performSearch() {
-    const query = searchInput.value;
-    const searchEngine = document.querySelector('input[name="searchEngine"]:checked').value;
-    let searchUrl;
-
-    // 添加跳转动画效果
-    const overlay = document.createElement('div');
-    overlay.className = 'search-overlay';
-    document.body.appendChild(overlay);
-
-    suggestionLength = 0;
-    focusHintLength = suggestionLength/2;
-    suggestions.style.height = '0px';
-    focusHint.style.transform = `translate(-50% , -50%)`;
-    updateWordCloud([]);
-    selectedSuggestionIndex = -1; // 重置选中的搜索建议索引
-
-    // 淡入动画效果
-    setTimeout(() => {
-        overlay.classList.add('visible');
-    }, 300);
-
-    // 淡出动画效果，然后执行搜索跳转
-    setTimeout(() => {
-        switch(searchEngine) {
-            case 'baidu':
-                searchUrl = `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`;
-                break;
-            case 'bing':
-                searchUrl = `https://bing.com/search?q=${encodeURIComponent(query)}`;
-                break;
-            case 'google':
-                searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-                break;
-            case 'duckduckgo':
-                searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
-                break;
-        }
-        
-        window.open(searchUrl, '_blank');
-        searchInput.value = '';
-        
-        // 移除 overlay 元素
-        setTimeout(() => {
-            overlay.classList.remove('visible');
-            setTimeout(() => {
-                overlay.remove();
-            }, 125); // 等待淡出动画完成后移除 overlay 元素
-        }, 250); // 等待搜索跳转完成后执行淡出动画
-    }, 500); // 500毫秒后执行搜索跳转，以便观察跳转动画
+    const query = searchInput.value.trim();
+    if (!query) return;
+    const engine = document.querySelector('input[name="searchEngine"]:checked').value;
+    const map = {
+        baidu: `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`,
+        bing: `https://bing.com/search?q=${encodeURIComponent(query)}`,
+        google: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+        duckduckgo: `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+    };
+    transitionAndOpen(map[engine]);
 }
 
 function performQiuSeek() {
-    const query = searchInput.value;
-    let searchUrl = `https://qs.ykload.com/?q=${encodeURIComponent(query)}`;
-
-    // 添加跳转动画效果
-    const overlay = document.createElement('div');
-    overlay.className = 'search-overlay';
-    document.body.appendChild(overlay);
-
-    suggestionLength = 0;
-    focusHintLength = suggestionLength/2;
-    suggestions.style.height = '0px';
-    focusHint.style.transform = `translate(-50% , -50%)`;
-    updateWordCloud([]);
-    selectedSuggestionIndex = -1; // 重置选中的搜索建议索引
-
-    // 淡入动画效果
-    setTimeout(() => {
-        overlay.classList.add('visible');
-    }, 300);
-
-    // 淡出动画效果，然后执行搜索跳转
-    setTimeout(() => {
-        window.open(searchUrl, '_blank');
-        searchInput.value = '';
-        
-        // 移除 overlay 元素
-        setTimeout(() => {
-            overlay.classList.remove('visible');
-            setTimeout(() => {
-                overlay.remove();
-            }, 125); // 等待淡出动画完成后移除 overlay 元素
-        }, 250); // 等待搜索跳转完成后执行淡出动画
-    }, 500); // 500毫秒后执行搜索跳转，以便观察跳转动画
+    const query = searchInput.value.trim();
+    if (!query) return;
+    transitionAndOpen(`https://qs.ykload.com/?q=${encodeURIComponent(query)}`);
 }
 
-// 添加按钮点击事件监听器
 normalSearchBtn.addEventListener('click', performSearch);
 qiuseekBtn.addEventListener('click', performQiuSeek);
+navBtn.addEventListener('click', () => searchInput.focus());
 
-// 搜索联想功能
+/* ---------- Suggestions ---------- */
 let debounceTimer;
+let suggestionLength = 0;
+let focusHintLength = 0;
 
-searchInput.addEventListener('input', function() {
+searchInput.addEventListener('input', function () {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
         const query = this.value.trim();
@@ -226,118 +171,104 @@ searchInput.addEventListener('input', function() {
             fetchSuggestions(query);
         } else {
             suggestionLength = 0;
-            focusHintLength = suggestionLength/2
+            focusHintLength = 0;
             suggestions.style.height = '0px';
-            focusHint.style.transform = `translate(-50% , -50%)`;
+            suggestions.innerHTML = '';
+            focusHint.style.transform = `translate(-50%, -50%)`;
             updateWordCloud([]);
         }
         toggleSearchButtons();
-        selectedSuggestionIndex = -1; // 重置选中的搜索建议索引
-    }, 300);
+        selectedSuggestionIndex = -1;
+    }, 240);
 });
 
-searchInput.addEventListener('focus', function() {
+searchInput.addEventListener('focus', function () {
     toggleFocusMode(true);
     toggleSearchButtons();
 });
 
-searchInput.addEventListener('blur', function() {
-    toggleFocusMode(false);
-    setTimeout(toggleSearchButtons, 100); // 延迟执行，以便在点击搜索按钮时能正确触发搜索
+searchInput.addEventListener('blur', function () {
+    setTimeout(() => {
+        toggleFocusMode(false);
+        toggleSearchButtons();
+    }, 120);
 });
 
 function fetchSuggestions(query) {
     const url = `https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=${encodeURIComponent(query)}&cb=processSuggestions`;
     const script = document.createElement('script');
     script.src = url;
+    script.onload = () => script.remove();
+    script.onerror = () => script.remove();
     document.body.appendChild(script);
 }
 
-// 前端定义的回调函数，用于处理返回的数据
-function processSuggestions(data) {
+window.processSuggestions = function (data) {
     const danmaku = document.querySelector('input[name="danmaku"]:checked').value;
-
-    if (!Array.isArray(data.s)) {
-        // console.error('Received unexpected data format:', data);
-        return;
-    }
-
-    showSuggestions(data.s); // 百度返回的是类似 Google 的 [搜索词, [相关搜索词]] 结构，可以使用 data.s 作为相关搜索词数组
+    if (!Array.isArray(data.s)) return;
+    showSuggestions(data.s);
     if (danmaku === 'on') {
-        updateWordCloud(data.s); // 也用 data.s 来更新词云
+        updateWordCloud(data.s);
+    } else {
+        updateWordCloud([]);
     }
-}
-
-let suggestionLength = 0;
-let focusHintLength = 0;
+};
 
 function showSuggestions(items) {
-    const currentSuggestions = document.querySelectorAll('.suggestion-item');
-    const newSuggestions = [];
+    suggestions.innerHTML = '';
 
     items.forEach((item, index) => {
         const li = document.createElement('li');
-        li.classList.add('suggestion-item', 'fade-out');
+        li.className = 'suggestion-item';
+        li.setAttribute('role', 'option');
         li.setAttribute('data-index', index);
+        li.style.animationDelay = `${index * 35}ms`;
 
         const textSpan = document.createElement('span');
+        textSpan.className = 'suggestion-text';
         textSpan.textContent = item;
-        textSpan.classList.add('suggestion-text');
 
-        const qiuseekBtn = document.createElement('button');
-        qiuseekBtn.innerHTML = '<img src="images/QiuSeek.svg" alt="QiuSeek" class="qiuseek-icon">';
-        qiuseekBtn.classList.add('suggestion-btn', 'qiuseek-btn');
+        const qsBtn = document.createElement('button');
+        qsBtn.type = 'button';
+        qsBtn.className = 'suggestion-btn';
+        qsBtn.setAttribute('aria-label', '使用求索 AI 搜索');
+        qsBtn.innerHTML = '<img src="images/QiuSeek.svg" alt="" class="qiuseek-icon">';
 
         li.appendChild(textSpan);
-        li.appendChild(qiuseekBtn);
+        li.appendChild(qsBtn);
 
-        li.addEventListener('click', function(e) {
-            if (!e.target.closest('.qiuseek-btn')) {
+        li.addEventListener('click', function (e) {
+            if (!e.target.closest('.suggestion-btn')) {
                 searchInput.value = item;
                 performSearch();
             }
         });
 
-        qiuseekBtn.addEventListener('click', function(e) {
+        qsBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             searchInput.value = item;
             performQiuSeek();
         });
 
-        newSuggestions.push(li);
-    });
-
-    suggestions.innerHTML = '';
-
-    newSuggestions.forEach(li => {
         suggestions.appendChild(li);
-        void li.offsetWidth;
-        li.classList.remove('fade-out');
     });
 
-    if (items.length === 0) {
-        suggestionLength = 0;
-    } else {
-        suggestionLength = items.length * 40;
-    }
-
+    suggestionLength = items.length === 0 ? 0 : items.length * 46;
     suggestions.style.height = suggestionLength + 'px';
     focusHintLength = suggestionLength / 2;
-    focusHint.style.transform = `translate(-50% , -${focusHintLength}px)`;
-    
-    selectedSuggestionIndex = -1; // 重置选中的搜索建议索引
+    focusHint.style.transform = `translate(-50%, -${focusHintLength}px)`;
+    selectedSuggestionIndex = -1;
 }
 
-// 点击页面其他地方时隐藏建议和词云
-document.addEventListener('click', function(e) {
-    if (e.target !== searchInput && e.target !== suggestions) {
+document.addEventListener('click', function (e) {
+    if (e.target !== searchInput && !e.target.closest('.search-bar') && !e.target.closest('.suggestions')) {
         suggestions.style.height = '0px';
         suggestions.style.opacity = 0;
         wordCloud.style.opacity = 0;
     }
 });
 
-// 添加焦点模式
+/* ---------- Focus mode ---------- */
 function toggleFocusMode(active) {
     document.querySelector('.background').classList.toggle('focus-mode', active);
     document.querySelector('.search-container').classList.toggle('focus-mode', active);
@@ -347,34 +278,32 @@ function toggleFocusMode(active) {
     document.querySelector('.time-date').classList.toggle('focus-mode', active);
     document.querySelector('footer').classList.toggle('focus-mode', active);
 
-    document.querySelector('.setting').classList.remove('open', active);
-    
+    document.querySelector('.setting').classList.remove('open');
 
-    // 延迟设置高度和透明度，确保平滑过渡
     setTimeout(() => {
-        focusHint.style.transform = active ? `translate(-50% , -${focusHintLength}px)` : `translate(-50% , -50%)`;
+        focusHint.style.transform = active ? `translate(-50%, -${focusHintLength}px)` : `translate(-50%, -50%)`;
         suggestions.style.height = active ? suggestionLength + 'px' : '0px';
         suggestions.style.opacity = active ? 1 : 0;
         wordCloud.style.opacity = active ? 1 : 0;
-    }, 100); // 可以根据实际情况调整延迟时间
+    }, 80);
 }
 
-// 使用空格键快速聚焦搜索栏
-document.addEventListener('keydown', function(e) {
-    if (document.activeElement === searchInput || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
-        return;
-    }
-    
+/* ---------- Keyboard shortcuts ---------- */
+document.addEventListener('keydown', function (e) {
+    const tag = document.activeElement.tagName;
+    if (document.activeElement === searchInput || tag === 'INPUT' || tag === 'TEXTAREA') return;
+
     if (e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        searchInput.focus();
+    } else if (e.key === '/') {
         e.preventDefault();
         searchInput.focus();
     }
 });
 
-// 词云功能
+/* ---------- Word cloud ---------- */
 let wordCloudWords = [];
-const wordCloud = document.getElementById('wordCloud');
-const currentWordCloud = wordCloud.querySelectorAll('.word-cloud-row');
 
 function updateWordCloud(words) {
     wordCloudWords = words;
@@ -382,122 +311,147 @@ function updateWordCloud(words) {
 }
 
 function renderWordCloud() {
-    wordCloud.style.opacity = 0; // 将透明度设置为0，触发淡出动画
-
-    // 在淡出动画完成后，清空词云内容并开始新的渲染
+    wordCloud.style.opacity = 0;
     setTimeout(() => {
         wordCloud.innerHTML = '';
         const rowCount = Math.floor(window.innerHeight / 100);
-
         for (let i = 0; i < rowCount; i++) {
             const row = document.createElement('div');
             row.className = 'word-cloud-row';
             row.style.top = `${i * 100}px`;
             row.style.left = `${Math.random() * 100}%`;
-            row.style.animationDuration = `${30 + Math.random() * 60}s`;
-            row.style.animationDirection = i % 2 === 0 ? 'normal' : 'normal';
-
+            row.style.animationDuration = `${36 + Math.random() * 60}s`;
             const rowWords = [...wordCloudWords, ...wordCloudWords];
             row.style.whiteSpace = 'pre';
             row.textContent = rowWords.join('              ');
-
             wordCloud.appendChild(row);
         }
-
-        // 强制浏览器回流，触发新的渲染
         void wordCloud.offsetWidth;
-
-        // 淡入新的词云
-        setTimeout(() => {
-            wordCloud.style.opacity = 1; // 淡入动画
-        }, 50); // 50毫秒后开始淡入动画
-    }, 300); // 等待0.3秒后开始清空词云内容和淡出动画，与CSS过渡的时长对应
+        if (wordCloudWords.length > 0) {
+            setTimeout(() => { wordCloud.style.opacity = 1; }, 60);
+        }
+    }, 280);
 }
 
-// 在窗口大小改变时重新渲染词云
 window.addEventListener('resize', renderWordCloud);
 
-// 初始化
-renderWordCloud();
-
-// 设置背景URL的函数
+/* ---------- Background ---------- */
 function setBackgroundUrl() {
     const bgType = document.querySelector('input[name="bg"]:checked').value;
     const backgroundElement = document.querySelector('.background');
-    let imageUrl = '';
 
+    if (bgType === 'aurora') {
+        // Pure Alive Design — no photo, only living aurora.
+        backgroundElement.classList.remove('fade-in');
+        backgroundElement.style.backgroundImage = 'none';
+        return;
+    }
+
+    let imageUrl = '';
     switch (bgType) {
         case 'landscape':
             imageUrl = 'https://api.dujin.org/bing/1920.php';
             break;
         case 'moe':
-            // 以下请求会在每次更改设置时被触发，固先停用
-            // 添加时间戳参数以确保每次请求唯一
-            // const timestamp = Date.now();
-            // imageUrl = `https://t.alcy.cc/moez?timestamp=${timestamp}`;
-
             imageUrl = `https://t.alcy.cc/moez`;
-            break;
-        default:
-            // Handle default case if needed
             break;
     }
 
     if (imageUrl) {
-        // 创建一个新的Image对象来加载背景图片
         const img = new Image();
-        img.onload = function() {
-            // 图片加载完毕后设置背景，并添加淡入动画类
+        img.onload = function () {
             backgroundElement.style.backgroundImage = `url('${imageUrl}')`;
             backgroundElement.classList.add('fade-in');
         };
-        img.src = imageUrl; // 开始加载图片
+        img.src = imageUrl;
     }
 }
 
-// 监测背景图片加载/切换的函数
-function monitorBackgroundChanges() {
-    const backgroundElement = document.querySelector('.background');
-
-    // 在CSS中定义.fade-in类的淡入效果
-    // 可以根据需要调整动画效果
-    backgroundElement.classList.add('fade-in');
-}
-
-// 页面加载完成时执行设置背景和添加动画效果
-document.addEventListener('DOMContentLoaded', function() {
-    setBackgroundUrl();
-    monitorBackgroundChanges();
-});
-
+/* ---------- Settings drawer ---------- */
 function toggleSettingOpen() {
-    var setting = document.querySelector('.setting');
-    // 切换是否具有 .open 类
+    const setting = document.querySelector('.setting');
     setting.classList.toggle('open');
 
-    document.querySelector('.background').classList.toggle('focus-mode');
-    document.querySelector('.search-container').classList.toggle('focus-mode');
-
-    document.querySelector('.container').classList.toggle('focus-mode');
-    document.querySelector('.time-date').classList.toggle('focus-mode');
-    document.querySelector('footer').classList.toggle('focus-mode');
+    const isOpen = setting.classList.contains('open');
+    document.querySelector('.background').classList.toggle('focus-mode', isOpen);
+    document.querySelector('.search-container').classList.toggle('focus-mode', isOpen);
+    document.querySelector('.container').classList.toggle('focus-mode', isOpen);
+    document.querySelector('.time-date').classList.toggle('focus-mode', isOpen);
+    document.querySelector('footer').classList.toggle('focus-mode', isOpen);
 }
 
-// 监听 #time 元素的点击事件
 document.getElementById('time').addEventListener('click', toggleSettingOpen);
 
+/* ---------- Search button visibility ---------- */
 function toggleSearchButtons() {
-    const buttonsVisible = searchInput.value.trim() !== '' && document.activeElement === searchInput;
-    normalSearchBtn.style.pointerEvents = buttonsVisible ? 'auto' : 'none';
-    normalSearchBtn.style.opacity = buttonsVisible ? 1 : 0;
-    normalSearchBtn.style.width = buttonsVisible ? '80px' : '0px';
-    qiuseekBtn.style.pointerEvents = buttonsVisible ? 'auto' : 'none';
-    qiuseekBtn.style.opacity = buttonsVisible ? 1 : 0;
-    qiuseekBtn.style.width = buttonsVisible ? '100px' : '0px';
-    navBtn.style.pointerEvents = buttonsVisible ? 'none' : 'auto';
-    navBtn.style.opacity = buttonsVisible ? 0 : 1;
-    navBtn.style.width = buttonsVisible ? '0px' : '45px';
+    const visible = searchInput.value.trim() !== '' && document.activeElement === searchInput;
+
+    normalSearchBtn.style.pointerEvents = visible ? 'auto' : 'none';
+    normalSearchBtn.style.opacity = visible ? 1 : 0;
+    normalSearchBtn.style.width = visible ? '78px' : '0px';
+
+    qiuseekBtn.style.pointerEvents = visible ? 'auto' : 'none';
+    qiuseekBtn.style.opacity = visible ? 1 : 0;
+    qiuseekBtn.style.width = visible ? '92px' : '0px';
+
+    navBtn.style.pointerEvents = visible ? 'none' : 'auto';
+    navBtn.style.opacity = visible ? 0 : 1;
+    navBtn.style.width = visible ? '0px' : '46px';
 }
 
-// 初始化搜索按钮显示状态
-document.addEventListener('DOMContentLoaded', toggleSearchButtons);
+/* ---------- Cursor glow + magnetic search bar ---------- */
+let cursorRafId = null;
+let cursorTargetX = window.innerWidth / 2;
+let cursorTargetY = window.innerHeight / 2;
+let cursorCurrentX = cursorTargetX;
+let cursorCurrentY = cursorTargetY;
+
+function smoothCursor() {
+    cursorCurrentX += (cursorTargetX - cursorCurrentX) * 0.18;
+    cursorCurrentY += (cursorTargetY - cursorCurrentY) * 0.18;
+    document.documentElement.style.setProperty('--cursor-x', `${cursorCurrentX}px`);
+    document.documentElement.style.setProperty('--cursor-y', `${cursorCurrentY}px`);
+    cursorRafId = requestAnimationFrame(smoothCursor);
+}
+
+document.addEventListener('mousemove', (e) => {
+    cursorTargetX = e.clientX;
+    cursorTargetY = e.clientY;
+    cursorGlow.classList.add('is-active');
+    if (cursorRafId === null) smoothCursor();
+
+    if (searchBar) {
+        const rect = searchBar.getBoundingClientRect();
+        const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+        const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+        searchBar.style.setProperty('--bar-glow-x', `${xPct}%`);
+        searchBar.style.setProperty('--bar-glow-y', `${yPct}%`);
+    }
+});
+
+document.addEventListener('mouseleave', () => {
+    cursorGlow.classList.remove('is-active');
+});
+
+/* ---------- Time tilt — subtle parallax ---------- */
+const timeEl = document.getElementById('time');
+const timeDateEl = document.querySelector('.time-date');
+document.addEventListener('mousemove', (e) => {
+    if (!timeDateEl || timeDateEl.classList.contains('focus-mode')) {
+        timeEl.style.transform = '';
+        return;
+    }
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    const dx = (e.clientX - cx) / cx;
+    const dy = (e.clientY - cy) / cy;
+    timeEl.style.transform = `translate3d(${dx * 6}px, ${dy * 4}px, 0)`;
+});
+
+/* ---------- Init ---------- */
+document.addEventListener('DOMContentLoaded', function () {
+    initializeSettings();
+    setBackgroundUrl();
+    toggleSearchButtons();
+    renderWordCloud();
+});
