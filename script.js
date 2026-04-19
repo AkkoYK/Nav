@@ -1,11 +1,19 @@
 // 更新时间和日期
+const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const MONTHS   = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
 function updateTimeDate() {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     document.getElementById('hours').textContent = hours;
     document.getElementById('minutes').textContent = minutes;
-    document.getElementById('date').textContent = now.toLocaleDateString();
+
+    const weekday = WEEKDAYS[now.getDay()];
+    const month = MONTHS[now.getMonth()];
+    const day = String(now.getDate()).padStart(2, '0');
+    const year = now.getFullYear();
+    document.getElementById('date').textContent = `${weekday} · ${day} ${month} ${year}`;
 }
 
 setInterval(updateTimeDate, 1000);
@@ -347,6 +355,15 @@ function toggleFocusMode(active) {
     document.querySelector('.time-date').classList.toggle('focus-mode', active);
     document.querySelector('footer').classList.toggle('focus-mode', active);
 
+    const ambient = document.querySelector('.ambient');
+    if (ambient) ambient.classList.toggle('dim', active);
+
+    // 进入焦点模式时清空视差内联 transform，让 CSS 的 scale/blur 接管
+    if (active) {
+        document.querySelector('.background').style.transform = '';
+        if (ambient) ambient.style.transform = '';
+    }
+
     document.querySelector('.setting').classList.remove('open', active);
     
 
@@ -501,3 +518,64 @@ function toggleSearchButtons() {
 
 // 初始化搜索按钮显示状态
 document.addEventListener('DOMContentLoaded', toggleSearchButtons);
+
+// ─── Alive Design 微交互 ─────────────────────────────────
+
+// 指针视差：背景与环境光随鼠标轻微偏移
+(function enablePointerParallax() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const bg = document.querySelector('.background');
+    const ambient = document.querySelector('.ambient');
+    if (!bg && !ambient) return;
+
+    let targetX = 0, targetY = 0;
+    let currentX = 0, currentY = 0;
+    let rafId = null;
+
+    function loop() {
+        currentX += (targetX - currentX) * 0.06;
+        currentY += (targetY - currentY) * 0.06;
+
+        if (bg) {
+            bg.style.transform = `scale(1.04) translate3d(${currentX * -10}px, ${currentY * -10}px, 0)`;
+        }
+        if (ambient) {
+            ambient.style.transform = `translate3d(${currentX * 18}px, ${currentY * 18}px, 0)`;
+        }
+
+        if (Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001) {
+            rafId = requestAnimationFrame(loop);
+        } else {
+            rafId = null;
+        }
+    }
+
+    window.addEventListener('pointermove', (e) => {
+        if (document.querySelector('.background')?.classList.contains('focus-mode')) return;
+        targetX = (e.clientX / window.innerWidth  - 0.5) * 2;
+        targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+        if (!rafId) rafId = requestAnimationFrame(loop);
+    }, { passive: true });
+})();
+
+// Esc 逃离焦点模式 / 关闭设置
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const setting = document.querySelector('.setting');
+    if (setting && setting.classList.contains('open')) {
+        toggleSettingOpen();
+        return;
+    }
+    if (document.activeElement === searchInput) {
+        searchInput.blur();
+    }
+});
+
+// 让时间区域键盘可达：Enter / Space 也可打开设置
+document.querySelector('.time-date')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        toggleSettingOpen();
+    }
+});
